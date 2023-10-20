@@ -1,4 +1,10 @@
 npm i express mysql dotenv hbs bcryptjs
 npm i nodemon --save
 npm i jsonwebtoken 
+npm i body-parser
+npm i express-session
+npm i dns
+npm i express-mysql-session
+
+# To start server once all are installed:
 npm start
