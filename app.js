@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const hbs = require('ejs');
+const hbs = require('hbs');
 const { resolveSrv } = require('dns');
 const MySQLStore = require('express-mysql-session')(session);
 
