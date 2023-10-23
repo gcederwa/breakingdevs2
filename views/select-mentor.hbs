@@ -8,39 +8,51 @@
     <link rel="stylesheet" href="/styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-    <title>Mentor Match</title>
+    <title>Mentor Match - Dashboard</title>
 </head>
 
 <body>
     <header>
         <h1>Mentor Match</h1>
-        {{#if userName}}
+        <nav>
+            {{#if userName}}
       <p>Hi {{userName}}!</p>
-      <nav>
+    {{else}}
+    {{/if}}
             <ul>
-                <li><a href="/mentor-dashboard">Home</a></li>
-                <li><a href="/my-mentees">My Mentees</a></li>
+                <li><a href="/mentee-dashboard">Home</a></li>
+                <li><a href="/my-mentors">My Mentors</a></li>
+                <li><a href="/select-mentor">Select a Mentor</a></li>
                 <li><a href="/about">About Us</a></li>
                 <li><a href="/logout">Logout</a></li>
             </ul>
         </nav>
-    {{else}}
-    <nav>
-            <ul>
-                <li><a href="..">Home</a></li>
-                <li><a href="/register">Find a Mentor</a></li>
-                <li><a href="/register">Become a Mentor</a></li>
-                <li><a href="/about">About Us</a></li>
-                <li><a href="/login">Login</a></li>
-                <li><a href="/register">Register</a></li>
-            </ul>
-        </nav>
-    {{/if}}
-        
     </header>
+<form action="/select-mentor" method="post">
+  <table id="mentors-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Select</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each mentors}}
+        <tr>
+          <td>{{name}}</td>
+          <td>
+            <input type="radio" id="mentor{{id}}" name="mentorId" value="{{id}}">
+            <label for="mentor{{id}}">Select</label>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <button type="submit" id="submit-button">Submit</button>
+</form>
 
-   <p>About Page</p>
 
+    
     <footer>
         <p>&copy; 2023 Mentor Match. All rights reserved.</p>
     </footer>

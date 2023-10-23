@@ -6,16 +6,22 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const hbs = require('hbs');
 const { resolveSrv } = require('dns');
 const MySQLStore = require('express-mysql-session')(session);
+const exphbs = require('express-handlebars');
 
 dotenv.config({ path: './.env'})
 
 const app = express();
 
 app.use(bodyParser.json());
-
+const hbs = exphbs.create({
+  helpers: {
+    isEqual: function (value1, value2, options) {
+      return value1 === value2 ? options.fn(this) : options.inverse(this);
+    }
+  }
+});
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
@@ -66,6 +72,7 @@ const publicDir = path.join(__dirname, './public')
 app.use(express.static(publicDir))
 app.use(express.urlencoded({extended: 'false'}))
 app.use(express.json())
+app.use(express.static('public'));
 
 app.set('view engine', 'hbs')
 app.set('views', __dirname + '/views'); // Specify the directory where your HBS files are located
@@ -79,7 +86,47 @@ db.connect((error) => {
     }
 })
 
+app.get('/my-mentees', function(req, res) {
+  // Get mentor ID from session
+  const mentorId = req.session.userId;
+  console.log(mentorId);
+  // Query the database to get all mentees of the mentor
+  const sql = 'SELECT users.* FROM users JOIN relationships ON users.id = relationships.mentee_id WHERE relationships.mentor_id = ?';
+  db.query(sql, [mentorId], function(err, results) {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
 
+    // If mentees are found, pass them to the template
+    const mentees = results ? results : []; // Get the mentees or an empty array if not found
+
+    // Render the my-mentees Handlebars template with the mentees
+    res.render('my-mentees', { mentees: mentees, userName : req.session.userName });
+  });
+});
+
+app.get('/my-mentees/:userId', (req, res) => {
+  const menteeId = req.params.userId;
+  console.log(menteeId);
+  // Query the database to get the Calendly link for the mentee
+  const sql = 'SELECT calendly_link FROM users WHERE id = ?';
+  db.query(sql, [menteeId], (error, results) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // If a Calendly link is found, pass it to the template
+    const calendlyLink = results[0] ? results[0].calendly_link : ''; // Get the Calendly link or an empty string if not found
+
+    // Render the my-mentees Handlebars template with the Calendly link
+    res.render('my-mentees', {
+      menteeName: req.session.userName, // Replace this with the mentee's name obtained from the database
+      calendlyLink: calendlyLink,
+    });
+  });
+});
 
 app.get("/", (req, res) => {
     if (req.session.userName) {
@@ -112,8 +159,63 @@ app.get('/mentor-dashboard', (req, res) => {
   
 app.get('/mentee-dashboard', (req, res) => {
     const userName = req.session.userName; // Retrieve the user's name from the session
+    const userID = req.session.id;
     res.render('mentee-dashboard', { userName: userName });
     console.log('User Name:', userName); // Log the user name to the console for debugging
+});
+
+app.get('/select-mentor', function(req, res) {
+  // Query the database to get all mentors
+  const sql = 'SELECT * FROM users WHERE role = "mentor"';
+  db.query(sql, function(err, results) {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // Render the select-mentor Handlebars template with the mentors
+    res.render('select-mentor', { mentors: results , userName : req.session.userName});
+  });
+});
+
+app.post('/select-mentor', function(req, res) {
+  // Get mentor ID from form data
+  const mentorId = req.body.mentorId;
+
+  // Get mentee ID from session or wherever it's stored
+  const menteeId = req.session.userId;
+
+  // Query the database to set the mentor for the mentee
+  const sql = 'INSERT INTO relationships (mentee_ID, mentor_ID) VALUES (?, ?)';
+  db.query(sql, [menteeId, mentorId], function(err) {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // Redirect to a success page or somewhere else
+    res.redirect('my-mentors', {userName : req.session.userName});
+  });
+});
+
+app.get('/my-mentors', function(req, res) {
+  // Get mentee ID from session
+  const menteeId = req.session.userId;
+  const name = req.session.userName;
+  // Query the database to get all mentors of the mentee
+  const sql = 'SELECT users.* FROM users JOIN relationships ON users.id = relationships.mentor_id WHERE relationships.mentee_id = ?';
+  db.query(sql, [menteeId], function(err, results) {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // If mentors are found, pass them to the template
+    const mentors = results ? results : []; // Get the mentors or an empty array if not found
+
+    // Render the my-mentors Handlebars template with the mentors
+    res.render('my-mentors', { mentors: mentors, userName : req.session.userName});
+  });
 });
 
 app.get('/logout', (req, res) => {
@@ -134,7 +236,7 @@ app.post('/login', (req, res) => {
       if (results.length > 0) {
         const storedPassword = results[0].password;
         const userRole = results[0].role; // Assuming 'role' is the column name for role in your database
-  
+        const userID = results[0].id;
         bcrypt.compare(password, storedPassword, (err, bcryptResult) => {
           if (bcryptResult) {
             // Passwords match, user is authenticated
@@ -142,10 +244,12 @@ app.post('/login', (req, res) => {
             const userName = results[0].name;
 
             req.session.userName = userName; // Store the user's name in the session
-          
+            req.session.userRole = userRole;
+            req.session.userId = userID; // Store user ID in session
             if (userRole === 'mentor') {
               res.redirect('/mentor-dashboard'); // Redirect mentors to the mentor dashboard
             } else if (userRole === 'mentee') {
+              console.log(req.session.userId);
               res.redirect('/mentee-dashboard'); // Redirect mentees to the mentee dashboard
             } else {
               // Handle other roles or unexpected cases
@@ -163,7 +267,7 @@ app.post('/login', (req, res) => {
     });
   });
 
-app.get("/about", (req, res) => {
+  app.get("/about", (req, res) => {
     if (req.session.userName) {
         // User is signed in, render personalized content
         res.render('about', { userName: req.session.userName });
@@ -173,14 +277,17 @@ app.get("/about", (req, res) => {
       }
 })
 
+
 app.post("/auth/register", (req, res) => {    
-    const { name, username, password, password_confirm, role } = req.body
+    const { name, username, password, password_confirm, role, calendlyLink } = req.body
 
     db.query('SELECT username FROM users WHERE username = ?', [username], async (error, result) => {
         if(error){
             console.log(error)
         }
-
+        if (!username || !password || !role || !name) {
+          return res.status(400).json({ error: 'All fields are required' });
+        }
         if( result.length > 0 ) {
             return res.render('register', {
                 message: 'This username is already in use'
@@ -191,11 +298,14 @@ app.post("/auth/register", (req, res) => {
             })
         }
 
+        if (role === 'mentee' && !calendlyLink) {
+          return res.status(400).json({ error: 'Calendly link is required for mentees' });
+        }
         let hashedPassword = await bcrypt.hash(password, 8)
 
         console.log(hashedPassword)
        
-        db.query('INSERT INTO users SET?', {name: name, username: username, password: hashedPassword, role: role}, (err, result) => {
+        db.query('INSERT INTO users SET?', {name: name, username: username, password: hashedPassword, role: role, calendly_link: calendlyLink}, (err, result) => {
             if(error) {
                 console.log(error)
             } else {
@@ -203,7 +313,15 @@ app.post("/auth/register", (req, res) => {
                     message: 'User registered!'
                 })
             }
-        })        
+        })
+        if (role === 'mentee') {
+          res.redirect('/mentee-dashboard');
+        } else if (role === 'mentor') {
+          res.redirect('/mentor-dashboard');
+        } else {
+          // Handle unknown role
+          res.status(403).send('Unauthorized');
+        }        
     })
 })
 
