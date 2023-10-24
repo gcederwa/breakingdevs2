@@ -138,6 +138,14 @@ app.get("/", (req, res) => {
       }
 })
 
+app.get("/menteequestionaire", (req, res) => {
+  res.render('menteequestionaire')
+})
+
+app.get("/mentorquestionaire", (req, res) => {
+  res.render('mentorquestionaire')
+})
+
 app.get("/my-mentees", (req, res) => {
     const userName = req.session.userName; // Retrieve the user's name from the session
     res.render("my-mentees", { userName: userName});;

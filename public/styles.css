@@ -164,3 +164,17 @@ footer {
     background-color: #f2f2f2;
   }
   
+  html {
+    height: 100%;
+    width: 100%;
+  }
+  .center {
+    margin: auto;
+    display: table;
+  }
+
+  p.center {
+    text-align-last: center;
+  }
+
+  
