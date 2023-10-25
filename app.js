@@ -124,7 +124,7 @@ app.get('/my-mentees/:userId', (req, res) => {
     res.render('my-mentees', {
       menteeName: req.session.userName, // Replace this with the mentee's name obtained from the database
       calendlyLink: calendlyLink,
-    });
+      });
   });
 });
 
