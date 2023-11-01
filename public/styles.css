@@ -28,7 +28,7 @@ nav ul li a {
 }
 
 .hero {
-    background-image: url('background-image.jpg'); /* Add your background image URL here */
+    background-image: url('background-image.jpg');
     background-size: cover;
     color: white;
     text-align: center;
@@ -144,10 +144,16 @@ footer {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    width: 100%;
   }
   
   #mentors-table, th, td {
     border: 1px solid #ddd;
+  }
+  #mentors-table th {
+    
+    text-align: left;
+    padding: 10px;
   }
   
   th, td {
@@ -177,4 +183,77 @@ footer {
     text-align-last: center;
   }
 
+  #mentor-questionaire-form {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  #form-title {
+    text-align: center;
+  }
+  
+  #personality-label,
+  #education-label,
+  #skills-label,
+  #advice-label {
+    display: block;
+    margin-top: 20px;
+  }
+  
+  #personality-select,
+  #education-select,
+  #skills-input,
+  #advice-input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+  }
+
+
+  #submit-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+  }
+
+  #mentor-questionnaire-form {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  #form-title {
+    text-align: center;
+  }
+  
+  #personality-label,
+  #education-label,
+  #skills-label,
+  #advice-label {
+    display: block;
+    margin-top: 20px;
+  }
+  
+  #personality-select,
+  #education-select,
+  #skills-input,
+  #advice-input 
+  {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+  }
+  
+ 
+
+  #submit-button-form {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+  }
+  
+  
   

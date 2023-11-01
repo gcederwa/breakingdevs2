@@ -33,6 +33,9 @@
     <thead>
       <tr>
         <th>Name</th>
+        <th>Education Level</th>
+        <th>Skills</th>
+        <th>Advice Type</th>
         <th>Select</th>
       </tr>
     </thead>
@@ -40,10 +43,10 @@
       {{#each mentors}}
         <tr>
           <td>{{name}}</td>
-          <td>
-            <input type="radio" id="mentor{{id}}" name="mentorId" value="{{id}}">
-            <label for="mentor{{id}}">Select</label>
-          </td>
+          <td>{{this.education}}</td>
+          <td>{{skills}}</td>
+          <td>{{adviceType}}</td>
+          <td><input type="radio" id="mentor{{id}}" name="mentorId" value="{{id}}"><label for="mentor{{id}}">Select</label></td>
         </tr>
       {{/each}}
     </tbody>
@@ -51,8 +54,6 @@
   <button type="submit" id="submit-button">Submit</button>
 </form>
 
-
-    
     <footer>
         <p>&copy; 2023 Mentor Match. All rights reserved.</p>
     </footer>
