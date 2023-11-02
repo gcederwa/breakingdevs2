@@ -107,8 +107,8 @@ app.get('/my-mentees', function(req, res) {
 });
 
 app.get('/my-mentees/:userId', (req, res) => {
-  const mentorId = req.params.userId;
-  console.log(mentorId);
+ const menteeId = req.params.userId;
+  console.log(menteeId);
   // Query the database to get the Calendly link for the mentee
   const sql = 'SELECT calendly_link FROM users WHERE id = ?';
   db.query(sql, [menteeId], (error, results) => {
@@ -116,13 +116,11 @@ app.get('/my-mentees/:userId', (req, res) => {
       console.error(error);
       return res.status(500).json({ error: 'Internal Server Error' });
     }
-
     // If a Calendly link is found, pass it to the template
     const calendlyLink = results[0] ? results[0].calendly_link : ''; // Get the Calendly link or an empty string if not found
-
-    // Render the my-mentees with the Calendly link
+    // Render the my-mentees Handlebars template with the Calendly link
     res.render('my-mentees', {
-      menteeName: req.session.userName, // mentee's name from the database
+      menteeName: req.session.userName, // Replace this with the mentee's name obtained from the database
       calendlyLink: calendlyLink,
       });
   });
