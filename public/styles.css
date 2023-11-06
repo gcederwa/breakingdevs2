@@ -255,5 +255,37 @@ footer {
     margin-top: 20px;
   }
   
+/* Dropdown Button */
+#userIcon {
+  border: none;
+  cursor: pointer;
+}
+
+/* The container <div> - needed to position the dropdown content */
+#userDropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+#dropdownContent {
+  display: none;
+  position: absolute;
+  min-width: 160px;
+  z-index: 1;
+  /* Position the dropdown content below the user icon */
+  top: 100%;
+  left: 0;
+  /* Add these lines */
+  box-sizing: border-box;
+  width: 100%;
+  text-align: left;
+}
+
+/* Show the dropdown menu on hover */
+#userDropdown:hover #dropdownContent {
+  display: block;
+}
+
   
   

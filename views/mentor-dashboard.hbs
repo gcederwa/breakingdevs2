@@ -20,15 +20,26 @@
     {{else}}
     {{/if}}
             <ul>
-                <li><a href="/mentor-dashboard">Home</a></li>
-                <li><a href="/my-mentees">My Mentees</a></li>
-                <li><a href="/about">About Us</a></li>
-                <li><a href="/logout">Logout</a></li>
-            </ul>
+  <li><a href="/mentor-dashboard">Home</a></li>
+  <li><a href="/my-mentees">My Mentees</a></li>
+  <li><a href="/about">About Us</a></li>
+  <!-- User Icon -->
+  <li class="dropdown" id="userDropdown">
+    <img src="{{#if profilePicture}}{{profilePicture}}{{else}}user-silhouette.png{{/if}}" id="userIcon" width="40px">
+    <div class="dropdown-content" id="dropdownContent">
+      <a href="/logout" id="logoutLink">Logout</a>
+    </div>
+  </li>
+</ul>
+
         </nav>
     </header>
     <a href="./mentorquestionaire">Click here to fill out your survey</a>
     <div class="calendly-inline-widget" data-url="{{calendlyLink}}" style="min-width:320px;height:700px;"></div>
+    <form action="/mentor-dashboard" method="post" enctype="multipart/form-data">
+  <input type="file" name="profilePicture" accept="image/*">
+  <button type="submit">Upload</button>
+</form>
 
     
     <footer>

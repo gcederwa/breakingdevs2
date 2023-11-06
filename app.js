@@ -9,6 +9,8 @@ const session = require('express-session');
 const { resolveSrv } = require('dns');
 const MySQLStore = require('express-mysql-session')(session);
 const exphbs = require('express-handlebars');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 dotenv.config({ path: './.env'})
 
@@ -86,10 +88,50 @@ db.connect((error) => {
     }
 })
 
+app.post('/mentor-dashboard', upload.single('profilePicture'), (req, res) => {
+
+  const filePath = req.file.path;
+
+  // Assuming you have a `users` table and a `profile_picture` column
+  const sql = 'UPDATE users SET profile_picture = ? WHERE id = ?';
+  const userId = req.session.userId;  // The logged in user's ID
+
+  db.query(sql, [filePath, userId], (err, result) => {
+    if (err) throw err;
+    console.log('Number of records updated: ' + result.affectedRows);
+  });
+
+  
+
+  res.redirect('/mentor-dashboard');
+});
+
+app.post('/mentee-dashboard', upload.single('profilePicture'), (req, res) => {
+  // req.file is the `profilePicture` file
+  // req.body will hold the text fields, if there were any
+
+  const filePath = req.file.path;
+
+  // Assuming you have a `users` table and a `profile_picture` column
+  const sql = 'UPDATE users SET profile_picture = ? WHERE id = ?';
+  const userId = req.session.userId;  // The logged in user's ID
+
+  db.query(sql, [filePath, userId], (err, result) => {
+    if (err) throw err;
+    console.log('Number of records updated: ' + result.affectedRows);
+  });
+
+  
+
+  res.redirect('/mentee-dashboard');
+});
+
+app.use('/uploads', express.static('uploads'));
+
 app.get('/my-mentees', function(req, res) {
   // Get mentor ID from session
   const mentorId = req.session.userId;
-  console.log(mentorId);
+
   // Query the database to get all mentees of the mentor
   const sql = 'SELECT users.* FROM users JOIN relationships ON users.id = relationships.mentee_id WHERE relationships.mentor_id = ?';
   db.query(sql, [mentorId], function(err, results) {
@@ -101,30 +143,78 @@ app.get('/my-mentees', function(req, res) {
     // If mentees are found, pass them to the template
     const mentees = results ? results : []; // Get the mentees or an empty array if not found
 
-    // Render the my-mentees with the mentees
-    res.render('my-mentees', { mentees: mentees, userName : req.session.userName });
+    // Query the database for the logged in user's profile picture path
+    db.query('SELECT profile_picture FROM users WHERE id = ?', [mentorId], (err, userResults) => {
+      if (err) throw err;
+      // Render the my-mentees page with the mentees and the profile picture
+      res.render('my-mentees', { mentees: mentees, userName: req.session.userName, profilePicture: userResults[0].profile_picture });
+    });
   });
 });
 
+
+// app.get('/my-mentees/:userId', (req, res) => {
+//  const menteeId = req.params.userId;
+//   console.log(menteeId);
+//   // Query the database to get the Calendly link for the mentee
+//   const sql = 'SELECT calendly_link FROM users WHERE id = ?';
+//   db.query(sql, [menteeId], (error, results) => {
+//     if (error) {
+//       console.error(error);
+//       return res.status(500).json({ error: 'Internal Server Error' });
+//     }
+//     // If a Calendly link is found, pass it to the template
+//     const calendlyLink = results[0] ? results[0].calendly_link : ''; // Get the Calendly link or an empty string if not found
+//     // Render the my-mentees Handlebars template with the Calendly link
+//     res.render('my-mentees', {
+//       menteeName: req.session.userName, // Replace this with the mentee's name obtained from the database
+//       calendlyLink: calendlyLink,
+//       });
+//   });
+// });
+
 app.get('/my-mentees/:userId', (req, res) => {
- const menteeId = req.params.userId;
-  console.log(menteeId);
+  const menteeId = req.params.userId;
+  const userId = req.session.userId;
+
   // Query the database to get the Calendly link for the mentee
-  const sql = 'SELECT calendly_link FROM users WHERE id = ?';
+  const sql = 'SELECT calendly_link, name FROM users WHERE id = ?';
   db.query(sql, [menteeId], (error, results) => {
     if (error) {
       console.error(error);
       return res.status(500).json({ error: 'Internal Server Error' });
     }
+
     // If a Calendly link is found, pass it to the template
     const calendlyLink = results[0] ? results[0].calendly_link : ''; // Get the Calendly link or an empty string if not found
-    // Render the my-mentees Handlebars template with the Calendly link
-    res.render('my-mentees', {
-      menteeName: req.session.userName, // Replace this with the mentee's name obtained from the database
-      calendlyLink: calendlyLink,
+    const menteeName = results[0] ? results[0].name : ''; // Get the mentee's name or an empty string if not found
+
+    // Query the database to get the userName and profilePicture for the logged in user
+    db.query('SELECT name, profile_picture FROM users WHERE id = ?', [userId], (err, userResults) => {
+      if (err) throw err;
+      const userName = userResults[0] ? userResults[0].name : ''; // Get the userName or an empty string if not found
+      const profilePicture = userResults[0] ? userResults[0].profile_picture : ''; // Get the profilePicture or an empty string if not found
+
+      console.log(profilePicture);
+      // Render the my-mentees page with the mentee's name, Calendly link, and the profile picture
+      res.render('my-mentees', {
+        menteeName: menteeName,
+        calendlyLink: calendlyLink,
+        showDetails: true,
+        userName: userName,
+        profilePicture: profilePicture
       });
+    });
   });
 });
+
+app.get('/my-mentees/uploads/:filename', (req, res) => {
+  res.sendFile(path.join(__dirname, '/uploads/' + req.params.filename));
+});
+
+
+app.use('/uploads', express.static('/uploads'));
+
 
 app.get("/", (req, res) => {
     if (req.session.userName) {
@@ -138,12 +228,25 @@ app.get("/", (req, res) => {
 
 app.get("/menteequestionaire", (req, res) => {
   
-  res.render('menteequestionaire', {userName: req.session.userName})
+  const userId = req.session.userId;  // The logged in user's ID
+
+  // Query the database for the logged in user's profile picture
+  db.query('SELECT profile_picture FROM users WHERE id = ?', [userId], (err, results) => {
+    if (err) throw err;
+    res.render('menteequestionaire', { userName: req.session.userName, profilePicture: results[0].profile_picture });
+  });
 })
 
 app.get("/mentorquestionaire", (req, res) => {
-  res.render('mentorquestionaire', {userName: req.session.userName})
-})
+  const userId = req.session.userId;  // The logged in user's ID
+
+  // Query the database for the logged in user's profile picture
+  db.query('SELECT profile_picture FROM users WHERE id = ?', [userId], (err, results) => {
+    if (err) throw err;
+    res.render('mentorquestionaire', { userName: req.session.userName, profilePicture: results[0].profile_picture });
+  });
+});
+
 
 
 app.post('/menteequestionaire', function(req, res) {
@@ -189,10 +292,16 @@ app.post('/mentorquestionaire', function(req, res) {
 });
 
 
-app.get("/my-mentees", (req, res) => {
-    const userName = req.session.userName; // Retrieve the user's name from the session
-    res.render("my-mentees", { userName: userName});;
-})
+// app.get("/my-mentees", (req, res) => {
+//   const userId = req.session.userId;  // The logged in user's ID
+
+//   // Query the database for the logged in user's profile picture path
+//   db.query('SELECT profile_picture FROM users WHERE id = ?', [userId], (err, results) => {
+//     if (err) throw err;
+//     res.render('my-mentees', { userName: req.session.userName, profilePicture: results[0].profile_picture });
+//   });
+// });
+
 
 app.get("/register", (req, res) => {
     res.render("register")
@@ -203,17 +312,38 @@ app.get("/login", (req,res) => {
 })
 
 app.get('/mentor-dashboard', (req, res) => {
+
+  const userId = req.session.userId;  // The logged in user's ID
+
+  db.query('SELECT profile_picture FROM users WHERE id = ?', [userId], (err, results) => {
+    if (err) throw err;
     const userName = req.session.userName; // Retrieve the user's name from the session
-    res.render('mentor-dashboard', { userName: userName });;
+    res.render('mentor-dashboard', { userName: userName, profilePicture: results[0].profile_picture });;
     console.log('User Name:', userName); // Log the user name to the console for debugging
+  });
+    
 });
   
+// app.get('/mentee-dashboard', (req, res) => {
+
+//     const userId = req.session.id;
+//     db.query('SELECT profile_picture FROM users WHERE id = ?', [userId], (err, results) => {
+//       if (err) throw err;
+//       const userName = req.session.userName; // Retrieve the user's name from the session
+//       res.render('mentee-dashboard', { userName: userName, profilePicture: results[0].profile_picture });;
+//       console.log('User Name:', userName); // Log the user name to the console for debugging
+//     });
+// });
+
 app.get('/mentee-dashboard', (req, res) => {
-    const userName = req.session.userName; // Retrieve the user's name from the session
-    const userID = req.session.id;
-    res.render('mentee-dashboard', { userName: userName });
-    console.log('User Name:', userName); // Log the user name to the console for debugging
+  const menteeId = req.session.userId;  // The logged in mentee's ID
+  
+  db.query('SELECT profile_picture FROM users WHERE id = ?', [menteeId], (err, results) => {
+    if (err) throw err;
+    res.render('mentee-dashboard', { profilePicture: results[0].profile_picture, userName: req.session.userName});
+  });
 });
+
 
 // app.get('/select-mentor', function(req, res) {
 //   // Query the database to get all mentors
@@ -229,6 +359,24 @@ app.get('/mentee-dashboard', (req, res) => {
 //   });
 // });
 
+// app.get('/select-mentor', (req, res) => {
+//   const userId = req.session.userId;
+//   const userName = req.session.userName;
+
+//   let sql = `
+//         SELECT mentors.*, mentorSurveys.education, mentorSurveys.skills, mentorSurveys.adviceType 
+//         FROM users AS mentors
+//         JOIN surveys AS mentorSurveys ON mentors.id = mentorSurveys.userId
+//         JOIN surveys AS menteeSurveys ON menteeSurveys.personality = mentorSurveys.personality
+//         WHERE menteeSurveys.userId = ${db.escape(userId)}
+//         AND mentors.role = 'mentor'
+//         AND mentors.id NOT IN (SELECT mentor_ID FROM relationships WHERE mentee_ID = ${db.escape(userId)})
+//     `;
+//   db.query(sql, (err, results) => {
+//       if(err) throw err;
+//       res.render('select-mentor', { mentors: results, userName: req.session.userName});
+//   });
+// });
 app.get('/select-mentor', (req, res) => {
   const userId = req.session.userId;
   const userName = req.session.userName;
@@ -244,9 +392,14 @@ app.get('/select-mentor', (req, res) => {
     `;
   db.query(sql, (err, results) => {
       if(err) throw err;
-      res.render('select-mentor', { mentors: results, userName: req.session.userName});
+      // Query the database for the logged in user's profile picture
+      db.query('SELECT profile_picture FROM users WHERE id = ?', [userId], (err, userResults) => {
+        if (err) throw err;
+        res.render('select-mentor', { mentors: results, userName: req.session.userName, profilePicture: userResults[0].profile_picture });
+      });
   });
 });
+
 
 
 
@@ -270,6 +423,26 @@ app.post('/select-mentor', function(req, res) {
   });
 });
 
+// app.get('/my-mentors', function(req, res) {
+//   // Get mentee ID from session
+//   const menteeId = req.session.userId;
+//   const name = req.session.userName;
+//   // Query the database to get all mentors of the mentee
+//   const sql = 'SELECT users.* FROM users JOIN relationships ON users.id = relationships.mentor_id WHERE relationships.mentee_id = ?';
+//   db.query(sql, [menteeId], function(err, results) {
+//     if (err) {
+//       console.error(err);
+//       return res.status(500).json({ error: 'Internal Server Error' });
+//     }
+
+//     // If mentors are found, pass them to the template
+//     const mentors = results ? results : []; // Get the mentors or an empty array if not found
+
+//     // Render the my-mentors page with the mentors
+//     res.render('my-mentors', { mentors: mentors, userName : req.session.userName});
+//   });
+// });
+
 app.get('/my-mentors', function(req, res) {
   // Get mentee ID from session
   const menteeId = req.session.userId;
@@ -285,10 +458,15 @@ app.get('/my-mentors', function(req, res) {
     // If mentors are found, pass them to the template
     const mentors = results ? results : []; // Get the mentors or an empty array if not found
 
-    // Render the my-mentors page with the mentors
-    res.render('my-mentors', { mentors: mentors, userName : req.session.userName});
+    // Query the database for the logged in user's profile picture
+    db.query('SELECT profile_picture FROM users WHERE id = ?', [menteeId], (err, userResults) => {
+      if (err) throw err;
+      // Render the my-mentors page
+      res.render('my-mentors', { mentors: mentors, userName: req.session.userName, profilePicture: userResults[0].profile_picture });
+    });
   });
 });
+
 
 app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
@@ -340,13 +518,20 @@ app.post('/login', (req, res) => {
 
   app.get("/about", (req, res) => {
     if (req.session.userName) {
-        // User is signed in, render personalized content
-        res.render('about', { userName: req.session.userName });
-      } else {
-        // User is not signed in, render generic content
-        res.render('about');
-      }
-})
+      // User is signed in, render personalized content
+      const userId = req.session.userId;  // The logged in user's ID
+  
+      // Query the database for the logged in user's profile picture path
+      db.query('SELECT profile_picture FROM users WHERE id = ?', [userId], (err, results) => {
+        if (err) throw err;
+        res.render('about', { userName: req.session.userName, profilePicture: results[0].profile_picture });
+      });
+    } else {
+      // User is not signed in, render generic content
+      res.render('about');
+    }
+  });
+  
 
 
 app.post("/auth/register", (req, res) => {    

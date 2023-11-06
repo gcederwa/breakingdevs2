@@ -6,6 +6,6 @@ npm i express-session
 npm i dns
 npm i express-mysql-session
 npm i express-handlebars
-
+npm i multer
 # To start server once all are installed:
 npm start
