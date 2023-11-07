@@ -42,7 +42,8 @@
       <th>Delete Mentor</th>
     </tr>
   </thead>
-  <tbody>
+  <form action="/my-mentors" method="post">
+<tbody>
     {{#each mentors}}
       <tr>
         <td>{{name}}</td>
@@ -53,6 +54,8 @@
       </tr>
     {{/each}}
   </tbody>
+  </form>
+  
 </table>
 
     <footer>
