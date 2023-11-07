@@ -467,6 +467,26 @@ app.get('/my-mentors', function(req, res) {
   });
 });
 
+// Delete selected mentor from mentee list
+app.post('/my-mentors', function(req, res) { 
+  // Get mentee ID from session
+  const menteeId = req.session.userId;
+  const mentorId = req.body.mentorId;
+
+  // Delete relationship where mentee and mentor id match
+  const sql = 'DELETE FROM relationships WHERE mentee_id = ? AND mentor_id = ?;';
+
+  db.query(sql, [menteeId], [mentorId], function(err, results) {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+    
+    // Render the my-mentors page with the mentors
+    res.render('my-mentors', { mentors: mentors, userName : req.session.userName});
+  });
+});
+
 
 app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
