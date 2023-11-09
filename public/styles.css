@@ -287,5 +287,178 @@ footer {
   display: block;
 }
 
+/* Style the tasks list */
+#tasks-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+/* Style each task item */
+#tasks-list li {
+  cursor: pointer;
+  position: relative;
+  padding: 12px 8px 12px 40px;
+  background: #eee;
+  font-size: 18px;
+  transition: 0.2s;
+  
+  /* make the list items unselectable */
+  -webkit-user-select: none; /* Safari 3.1+ */
+  -moz-user-select: none; /* Firefox 2+ */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none;
+}
+
+/* Style the checkmark */
+#tasks-list li .task-checkmark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 35px;
+  border: none;
+  background-color: none;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+/* Style the checkmark when the task is checked */
+#tasks-list li.checked .task-checkmark {
+  background-color: #888;
+  color: white;
+}
+
+/* Style the checkmark character (✓) */
+#tasks-list li .task-checkmark::before {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  transition: all 0.3s;
+}
+
+/* Add the checkmark character (✓) when the task is checked */
+#tasks-list li.checked .task-checkmark::before {
+  content: "✓";
+}
+
+
+.content-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.calendly-container {
+  /* Adjust the width as needed */
+  width: 50%;
+}
+
+.tasks-container {
+  /* Adjust the width as needed */
+  width: 40%;
+}
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+#goals-form-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#goals-form-container label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+#goals-form-container input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+#goals-form-container input[type="button"], 
+#goals-form-container input[type="submit"] {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #5cb85c;
+  color: #fff;
+  cursor: pointer;
+}
+
+#goals-form-container input[type="button"]:hover, 
+#goals-form-container input[type="submit"]:hover {
+  background-color: #449d44;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+}
+
+#goals-form-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#goals-form-container label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+#goals-form-container input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+#goals-form-container input[type="button"], 
+#goals-form-container input[type="submit"] {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #5cb85c;
+  color: #fff;
+  cursor: pointer;
+}
+
+#goals-form-container input[type="button"]:hover, 
+#goals-form-container input[type="submit"]:hover {
+  background-color: #449d44;
+}
+
+/* Add styles for the goals list */
+#goals-list {
+  list-style-type: none;
+  padding: 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#goals-list li {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+#goals-list li:last-child {
+  border-bottom: none;
+}
+
   
   

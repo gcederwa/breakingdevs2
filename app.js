@@ -173,6 +173,81 @@ app.get('/my-mentees', function(req, res) {
 //   });
 // });
 
+// app.get('/my-mentees/:userId', (req, res) => {
+//   const menteeId = req.params.userId;
+//   const userId = req.session.userId;
+
+//   // Query the database to get the Calendly link for the mentee
+//   const sql = 'SELECT calendly_link, goals_checklist name FROM users WHERE id = ?';
+//   db.query(sql, [menteeId], (error, results) => {
+//     if (error) {
+//       console.error(error);
+//       return res.status(500).json({ error: 'Internal Server Error' });
+//     }
+
+//     // If a Calendly link is found, pass it to the template
+//     const calendlyLink = results[0] ? results[0].calendly_link : ''; // Get the Calendly link or an empty string if not found
+//     const menteeName = results[0] ? results[0].name : ''; // Get the mentee's name or an empty string if not found
+    
+    
+
+//     // Query the database to get the userName and profilePicture for the logged in user
+//     db.query('SELECT name, profile_picture FROM users WHERE id = ?', [userId], (err, userResults) => {
+//       if (err) throw err;
+//       const userName = userResults[0] ? userResults[0].name : ''; // Get the userName or an empty string if not found
+//       const profilePicture = userResults[0] ? userResults[0].profile_picture : ''; // Get the profilePicture or an empty string if not found
+
+      
+//       console.log(menteeName);
+//       console.log(profilePicture);
+//       // Render the my-mentees page with the mentee's name, Calendly link, and the profile picture
+//       res.render('my-mentees', {
+//         menteeName: menteeName,
+//         calendlyLink: calendlyLink,
+//         showDetails: true,
+//         userName: userName,
+//         profilePicture: profilePicture,
+        
+//       });
+//     });
+//   });
+// });
+
+// app.get('/my-mentees/:userId', (req, res) => {
+//   const menteeId = req.params.userId;
+//   const userId = req.session.userId;
+
+//   // Query the database to get the Calendly link for the mentee
+//   const sql = 'SELECT calendly_link, name FROM users WHERE id = ?';
+//   db.query(sql, [menteeId], (error, results) => {
+//     if (error) {
+//       console.error(error);
+//       return res.status(500).json({ error: 'Internal Server Error' });
+//     }
+
+//     // If a Calendly link is found, pass it to the template
+//     const calendlyLink = results[0] ? results[0].calendly_link : ''; // Get the Calendly link or an empty string if not found
+//     const menteeName = results[0] ? results[0].name : ''; // Get the mentee's name or an empty string if not found
+
+//     // Query the database to get the userName and profilePicture for the logged in user
+//     db.query('SELECT name, profile_picture FROM users WHERE id = ?', [userId], (err, userResults) => {
+//       if (err) throw err;
+//       const userName = userResults[0] ? userResults[0].name : ''; // Get the userName or an empty string if not found
+//       const profilePicture = userResults[0] ? userResults[0].profile_picture : ''; // Get the profilePicture or an empty string if not found
+
+//       console.log(profilePicture);
+//       // Render the my-mentees page with the mentee's name, Calendly link, and the profile picture
+//       res.render('my-mentees', {
+//         menteeName: menteeName,
+//         calendlyLink: calendlyLink,
+//         showDetails: true,
+//         userName: userName,
+//         profilePicture: profilePicture
+//       });
+//     });
+//   });
+// });
+
 app.get('/my-mentees/:userId', (req, res) => {
   const menteeId = req.params.userId;
   const userId = req.session.userId;
@@ -195,22 +270,54 @@ app.get('/my-mentees/:userId', (req, res) => {
       const userName = userResults[0] ? userResults[0].name : ''; // Get the userName or an empty string if not found
       const profilePicture = userResults[0] ? userResults[0].profile_picture : ''; // Get the profilePicture or an empty string if not found
 
-      console.log(profilePicture);
-      // Render the my-mentees page with the mentee's name, Calendly link, and the profile picture
-      res.render('my-mentees', {
-        menteeName: menteeName,
-        calendlyLink: calendlyLink,
-        showDetails: true,
-        userName: userName,
-        profilePicture: profilePicture
+      // Query the database to get the tasks for the mentee
+      db.query('SELECT * FROM tasks WHERE mentee_id = ?', [menteeId], (err, taskResults) => {
+        if (err) throw err;
+        const tasks = taskResults; // Get the tasks or an empty array if not found
+
+        // Render the my-mentees page with the mentee's name, Calendly link, profile picture, and tasks
+        res.render('my-mentees', {
+          menteeName: menteeName,
+          calendlyLink: calendlyLink,
+          showDetails: true,
+          userName: userName,
+          profilePicture: profilePicture,
+          tasks: tasks
+        });
       });
     });
   });
 });
 
+
 app.get('/my-mentees/uploads/:filename', (req, res) => {
   res.sendFile(path.join(__dirname, '/uploads/' + req.params.filename));
 });
+
+app.get('/goals', (req, res) => {
+  res.render('goals');
+});
+
+app.post('/goals', (req, res) => {
+  const userId = req.session.userId; // Get the user ID from the session
+
+  // Query the database to insert the new goals
+  const sql = 'INSERT INTO tasks (description, status, mentee_id) VALUES (?, ?, ?)';
+  
+  for (var i = 1; i <= Object.keys(req.body).length; i++) {
+    var goal = req.body['goal' + i];
+    if (goal) { // Only insert the goal if it is not empty
+      db.query(sql, [goal, 'not_completed', userId], (err, results) => {
+        if (err) throw err;
+      });
+    }
+  }
+
+  res.redirect('/mentee-dashboard'); // Redirect to the goals page
+});
+
+
+
 
 
 app.use('/uploads', express.static('/uploads'));
@@ -555,7 +662,7 @@ app.post('/login', (req, res) => {
 
 
 app.post("/auth/register", (req, res) => {    
-  const { name, username, password, password_confirm, role, calendlyLink } = req.body
+  const { name, username, password, password_confirm, role, calendlyLink, goalsList} = req.body
 
   db.query('SELECT username FROM users WHERE username = ?', [username], async (error, result) => {
       if(error){
@@ -581,10 +688,11 @@ app.post("/auth/register", (req, res) => {
 
       console.log(hashedPassword)
      
-      db.query('INSERT INTO users SET?', {name: name, username: username, password: hashedPassword, role: role, calendly_link: calendlyLink}, (err, result) => {
+      db.query('INSERT INTO users SET?', {name: name, username: username, password: hashedPassword, role: role, calendly_link: calendlyLink, goals_checklist: goalsList}, (err, result) => {
           if(error) {
               console.log(error)
           } else {
+            
               return res.render('register', {
                   message: 'User registered!'
               })

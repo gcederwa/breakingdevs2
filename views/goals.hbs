@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Enter Your Goals</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+  <h1>Enter Your Goals</h1>
+
+  <div id="goals-form-container">
+    <form id="goals-form" action="/goals" method="POST">
+      <div id="goal-fields">
+        <label for="goal1">Goal:</label><br>
+        <input type="text" id="goal1" name="goal1"><br>
+      </div>
+      <input type="button" id="add-goal" value="Add Another Goal">
+      <input type="submit" value="Submit">
+    </form>
+  </div>
+
+  {{#if goals}}
+    <h2>Your Goals</h2>
+    <ul>
+      {{#each goals}}
+        <li>{{this.description}}</li>
+      {{/each}}
+    </ul>
+  {{/if}}
+
+  <script>
+    $(document).ready(function() {
+      var goalCount = 1;
+
+      $('#add-goal').click(function() {
+        goalCount++;
+        var newGoalField = '<label for="goal' + goalCount + '">Goal:</label><br><input type="text" id="goal' + goalCount + '" name="goal' + goalCount + '"><br>';
+        $('#goal-fields').append(newGoalField);
+      });
+    });
+  </script>
+</body>
+</html>

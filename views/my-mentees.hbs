@@ -35,10 +35,29 @@
         </nav>
     </header>
 
-{{#if calendlyLink}}
-    <h1> {{menteeName}}'s Availability:</h1>
-  <div class="calendly-inline-widget" data-url="{{calendlyLink}}" style="min-width:320px;height:700px;"></div>
-{{/if}}
+<div class="content-container">
+  {{#if calendlyLink}}
+    <div class="calendly-container">
+      <h1>{{menteeName}}'s Availability:</h1>
+      <div class="calendly-inline-widget" data-url="{{calendlyLink}}" style="min-width:320px;height:700px;"></div>
+    </div>
+  {{/if}}
+
+  {{#if tasks}}
+    <div class="tasks-container">
+      <h2>{{menteeName}}'s Goals</h2>
+      <ul id="tasks-list">
+        {{#each tasks}}
+          <li class="{{#if this.done}}checked{{/if}}">
+            <div class="task-checkmark"></div>
+            {{this.description}}
+          </li>
+        {{/each}}
+      </ul>
+    </div>
+  {{/if}}
+</div>
+
 
 <table id="mentees-table">
   <thead>
@@ -64,7 +83,7 @@
 
 
     <footer>
-        <p>&copy; 2023 Mentor Match. All rights reserved.</p>
+        <p>© 2023 Mentor Match. All rights reserved.</p>
     </footer>
 </body>
 
