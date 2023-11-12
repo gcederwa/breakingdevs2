@@ -10,6 +10,7 @@ const { resolveSrv } = require('dns');
 const MySQLStore = require('express-mysql-session')(session);
 const exphbs = require('express-handlebars');
 const multer = require('multer');
+const { stringify } = require('querystring');
 const upload = multer({ dest: 'uploads/' });
 
 dotenv.config({ path: './.env'})
@@ -578,19 +579,24 @@ app.get('/my-mentors', function(req, res) {
 app.post('/my-mentors', function(req, res) { 
   // Get mentee ID from session
   const menteeId = req.session.userId;
-  const mentorId = req.body.mentorId;
-
-  // Delete relationship where mentee and mentor id match
-  const sql = 'DELETE FROM relationships WHERE mentee_id = ? AND mentor_id = ?;';
-
-  db.query(sql, [menteeId], [mentorId], function(err, results) {
+  
+  db.query('SELECT mentor_id FROM relationships WHERE mentee_id = ?', [menteeId], function(err, results) {
     if (err) {
       console.error(err);
       return res.status(500).json({ error: 'Internal Server Error' });
     }
     
-    // Render the my-mentors page with the mentors
-    res.render('my-mentors', { mentors: mentors, userName : req.session.userName});
+    // put results into variable
+    // i need to figure out how to change position
+    const mentorId = results[0].mentor_id;
+    const sql = 'DELETE FROM relationships WHERE mentee_id = ? AND mentor_id = ?;';
+
+    // say goodbye
+    db.query(sql, [menteeId, mentorId], function(err) {
+      if (err) throw err;
+      console.log('Removed Relationship');
+      res.redirect('my-mentors');
+    });
   });
 });
 

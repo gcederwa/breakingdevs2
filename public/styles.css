@@ -30,7 +30,7 @@ nav ul li a {
 .hero {
     background-image: url('background-image.jpg');
     background-size: cover;
-    color: white;
+    color: black;
     text-align: center;
     padding: 100px 0;
 }
