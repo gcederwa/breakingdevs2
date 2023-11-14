@@ -40,7 +40,7 @@ nav ul li a {
 .hero {
   background-image: url('background-image.jpg');
   background-size: cover;
-  color: black;
+  color: rgb(255, 255, 255);
   text-align: center;
   padding: 100px 0;
 }
