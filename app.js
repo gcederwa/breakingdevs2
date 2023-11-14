@@ -11,6 +11,7 @@ const { resolveSrv } = require('dns');
 const MySQLStore = require('express-mysql-session')(session);
 const exphbs = require('express-handlebars');
 const multer = require('multer');
+const { stringify } = require('querystring');
 const upload = multer({ dest: 'uploads/' });
 
 dotenv.config({ path: './.env' })
@@ -465,7 +466,6 @@ app.post('/my-mentors', function (req, res) {
       console.error(err);
       return res.status(500).json({ error: 'Internal Server Error' });
     }
-
     // put results into variable
     // i need to figure out how to change position
     const mentorId = results[0].mentor_id;
