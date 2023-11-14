@@ -87,10 +87,11 @@
     <p>Hi {{userName}}!</p>
     <nav>
       <ul>
-        <li><a href="/mentor-dashboard">Home</a></li>
-        <li><a href="/my-mentees">My Mentees</a></li>
+        <li><a href="/mentee-dashboard">Home</a></li>
+        <li><a href="/my-mentors">My Mentors</a></li>
+        <li><a href="/select-mentor">Select a Mentor</a></li>
+        <li><a href="/goals">Your Goals</a></li>
         <li><a href="/about">About Us</a></li>
-        <!-- User Icon -->
         <li class="dropdown" id="userDropdown">
           <img src="{{#if profilePicture}}{{profilePicture}}{{else}}user-silhouette.png{{/if}}" id="userIcon"
             width="40px">
@@ -104,6 +105,8 @@
     <nav>
       <ul>
         <li><a href="..">Home</a></li>
+        <li><a href="/register">Find a Mentor</a></li>
+        <li><a href="/register">Become a Mentor</a></li>
         <li><a href="/about">About Us</a></li>
         <li><a href="/login">Login</a></li>
         <li><a href="/register">Register</a></li>

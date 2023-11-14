@@ -2,65 +2,67 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">    <title>Document</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-    <title>Mentor Match - Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <title>Mentor Match - Dashboard</title>
 </head>
 
 <body>
-    <header>
-        <h1>Mentor Match</h1>
-        <nav>
-        {{#if userName}}
-        <p>Hi {{userName}}!</p>
-        {{/if}}
-            <ul>
-                <li><a href="/mentee-dashboard">Home</a></li>
-                <li><a href="/my-mentors">My Mentors</a></li>
-                <li><a href="/select-mentor">Select a Mentor</a></li>
-                <li><a href="/about">About Us</a></li>
-                <!-- User Icon -->
-  <li class="dropdown" id="userDropdown">
-    <img src="{{#if profilePicture}}{{profilePicture}}{{else}}user-silhouette.png{{/if}}" id="userIcon" width="40px">
-    <div class="dropdown-content" id="dropdownContent">
-      <a href="/logout" id="logoutLink">Logout</a>
-    </div>
-  </li>
-
-            </ul>
-        </nav>
-    </header>
-    <table id="mentors-table">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Role</th>
-      <th>Delete Mentor</th>
-    </tr>
-  </thead>
-  <form action="/my-mentors" method="post">
-<tbody>
-    {{#each mentors}}
+  <header>
+    <h1>Mentor Match</h1>
+    <nav>
+      {{#if userName}}
+      <p>Hi {{userName}}!</p>
+      {{/if}}
+      <ul>
+        <li><a href="/mentee-dashboard">Home</a></li>
+        <li><a href="/my-mentors">My Mentors</a></li>
+        <li><a href="/select-mentor">Select a Mentor</a></li>
+        <li><a href="/viewTasks">Your Goals</a></li>
+        <li><a href="/about-us">About Us</a></li>
+        <li class="dropdown" id="userDropdown">
+          <img src="{{#if profilePicture}}{{profilePicture}}{{else}}user-silhouette.png{{/if}}" id="userIcon"
+            width="40px">
+          <div class="dropdown-content" id="dropdownContent">
+            <a href="/logout" id="logoutLink">Logout</a>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <table id="mentors-table">
+    <thead>
       <tr>
-        <td>{{name}}</td>
-        <td>{{role}}</td>
-        <td>
-          <button type="submit" id="submit-button">Remove</button>
-        </td>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Delete Mentor</th>
       </tr>
-    {{/each}}
-  </tbody>
-  </form>
-  
-</table>
+    </thead>
+    <form action="/my-mentors" method="post">
+      <tbody>
+        {{#each mentors}}
+        <tr>
+          <td>{{name}}</td>
+          <td>{{role}}</td>
+          <td>
+            <button type="submit" id="submit-button">Remove</button>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </form>
 
-    <footer>
-        <p>&copy; 2023 Mentor Match. All rights reserved.</p>
-    </footer>
+  </table>
+
+  <footer>
+    <p>&copy; 2023 Mentor Match. All rights reserved.</p>
+  </footer>
 </body>
 
 </html>

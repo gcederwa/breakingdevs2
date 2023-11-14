@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="/styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-  </head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <style>
+        #login-button {
+            background-color: #374f37;
+        }
+    </style>
 </head>
+</head>
+
 <body>
     {{!-- Navigation links --}}
     <header>
@@ -16,8 +24,6 @@
         <nav>
             <ul>
                 <li><a href="..">Home</a></li>
-                <li><a href="/register">Find a Mentor</a></li>
-                <li><a href="/register">Become a Mentor</a></li>
                 <li><a href="/about">About Us</a></li>
                 <li><a href="/login">Login</a></li>
                 <li><a href="/register">Register</a></li>
@@ -26,24 +32,25 @@
     </header>
 
     {{!-- Body --}}
-    <div class="container mt-4">
-        <div class="card" style="width: 18rem;">            
-            <div class="card-header">Login Form</div>    
+    <div class="container mt-4" id="loginform">
+        <div class="card" style="width: 18rem;">
+            <div class="card-header">Login Form</div>
             <div class="card-body">
                 <form method="POST">
                     <div class="mb-3">
                         <label for="email-lgn" class="form-label">Email</label>
-                        <input type="text" class="form-control" id="email-lgn" name="username">                        
-                    </div>                    
+                        <input type="text" class="form-control" id="email-lgn" name="username">
+                    </div>
                     <div class="mb-3">
                         <label for="password-lgn" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password-lgn" name="password">
                     </div>
-                    
-                    <button type="submit" class="btn btn-primary">Submit</button>
+
+                    <button type="submit" class="btn btn-primary" id="login-button">Submit</button>
                 </form>
             </div>
         </div>
     </div>
 </body>
+
 </html>

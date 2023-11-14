@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="/styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-  </head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <style>
+        #reg-button {
+            background-color: #374f37;
+        }
+    </style>
 </head>
+</head>
+
 <body>
     {{!-- Navigation links --}}
     <header>
@@ -16,8 +24,6 @@
         <nav>
             <ul>
                 <li><a href="..">Home</a></li>
-                <li><a href="/register">Find a Mentor</a></li>
-                <li><a href="/register">Become a Mentor</a></li>
                 <li><a href="/about">About Us</a></li>
                 <li><a href="/login">Login</a></li>
                 <li><a href="/register">Register</a></li>
@@ -26,18 +32,18 @@
     </header>
 
     {{!-- Body --}}
-    <div class="container mt-4">
-        <div class="card" style="width: 18rem;">            
-            <div class="card-header">Register Form</div>    
+    <div class="container mt-4" id="registrationform">
+        <div class="card" style="width: 18rem;">
+            <div class="card-header">Register Form</div>
             <div class="card-body">
                 <form action="/auth/register" method="POST">
                     <div class="mb-3">
                         <label for="name-reg" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name-reg" name="name">                        
+                        <input type="text" class="form-control" id="name-reg" name="name">
                     </div>
                     <div class="mb-3">
                         <label for="email-reg" class="form-label">Email</label>
-                        <input type="text" class="form-control" id="email-reg" name="username">                        
+                        <input type="text" class="form-control" id="email-reg" name="username">
                     </div>
                     <div class="mb-3">
                         <label for="password-reg" class="form-label">Password</label>
@@ -50,29 +56,27 @@
                     <div class="mb-3">
                         <label for="calendly-reg" class="form-label">Calendly Link - Mentees Only</label>
                         <input type="text" class="form-control" id="calendly-reg" name="calendlyLink">
-                    </div>
-                    <div class="mb-3">
-                        <label for="calendly-reg" class="form-label">Goals Link - Mentees Only</label>
-                        <input type="text" class="form-control" id="calendly-reg" name="goalsList">
+                        <a href="https://calendly.com/">Don't have a Calendly Account? Click Here!</a>
                     </div>
                     <div>
-                        <label id= "role-dropdown" for="roles">Choose Account Type</label>
+                        <label id="role-dropdown" for="roles">Choose Account Type</label>
                         <br>
                         <select name="role">
                             <option value="mentor">Mentor</option>
                             <option value="mentee">Mentee</option>
                         </select>
-                      </div>
-                      <br>
-                    
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                    <br>
+
+                    <button type="submit" class="btn btn-primary" id="reg-button">Submit</button>
                 </form>
             </div>
         </div>
 
         {{#if message }}
-            <h4 class="alert alert-danger mt-4">{{message}}</h4>
+        <h4 class="alert alert-danger mt-4">{{message}}</h4>
         {{/if}}
     </div>
 </body>
+
 </html>
