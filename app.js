@@ -109,7 +109,6 @@ app.post('/mentor-dashboard', upload.single('profilePicture'), (req, res) => {
 
   const filePath = req.file.path;
 
-  // Assuming you have a `users` table and a `profile_picture` column
   const sql = 'UPDATE users SET profile_picture = ? WHERE id = ?';
   const userId = req.session.userId;  // The logged in user's ID
 
@@ -129,7 +128,6 @@ app.post('/mentee-dashboard', upload.single('profilePicture'), (req, res) => {
 
   const filePath = req.file.path;
 
-  // Assuming you have a `users` table and a `profile_picture` column
   const sql = 'UPDATE users SET profile_picture = ? WHERE id = ?';
   const userId = req.session.userId;  // The logged in user's ID
 
@@ -353,6 +351,7 @@ app.get('/select-mentor', (req, res) => {
   const userId = req.session.userId;
   const userName = req.session.userName;
 
+  //Query database for mentors name, skillsm advice type, and education
   let sql = `
         SELECT mentors.*, mentorSurveys.education, mentorSurveys.skills, mentorSurveys.adviceType 
         FROM users AS mentors
@@ -467,7 +466,6 @@ app.post('/my-mentors', function (req, res) {
       return res.status(500).json({ error: 'Internal Server Error' });
     }
     // put results into variable
-    // i need to figure out how to change position
     const mentorId = results[0].mentor_id;
     const sql = 'DELETE FROM relationships WHERE mentee_id = ? AND mentor_id = ?;';
 
